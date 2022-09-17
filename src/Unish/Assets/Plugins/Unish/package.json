@@ -4,8 +4,9 @@
   "displayName": "Unish",
   "description": "Runtime shell-like debug console",
   "unity": "2021.3",
+  "unityRelease": "3f1",
   "dependencies": {
-    "com.cysharp.unitask": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask#2.3.1",
+    "com.cysharp.unitask": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask",
     "com.unity.inputsystem": "1.3.0"
   },
   "keywords": [
