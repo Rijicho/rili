@@ -1,0 +1,21 @@
+﻿{
+  "name": "com.rili.unish",
+  "version": "0.0.1",
+  "displayName": "Unish",
+  "description": "Runtime shell-like debug console",
+  "unity": "2021.3",
+  "dependencies": {
+    "com.cysharp.unitask": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask",
+    "com.unity.inputsystem": "1.3.0"
+  },
+  "keywords": [
+    "unish",
+    "shell",
+    "debug"
+  ],
+  "author": {
+    "name": "Rijicho",
+    "email": "rijicho.nl@gmail.com",
+    "url": "https://twitter.com/Rijicho_nl"
+  }
+}
