@@ -1,0 +1,34 @@
+﻿root = true
+
+[*]
+indent_style = space
+
+[*.cs]
+charset = utf-8
+indent_size = 4
+max_line_length = 160
+insert_final_newline = true
+end_of_line = lf
+dotnet_sort_system_directives_first = true
+csharp_style_var_for_built_in_types = true
+csharp_indent_case_contents = true
+csharp_indent_case_contents_when_block = false
+csharp_indent_switch_labels = true
+csharp_indent_labels = flush_left
+csharp_indent_braces = false
+csharp_new_line_before_open_brace = all
+csharp_new_line_before_else = true
+csharp_new_line_before_catch = true
+csharp_new_line_before_finally = true
+csharp_new_line_before_members_in_object_initializers = true
+csharp_new_line_before_members_in_anonymous_types = true
+csharp_new_line_between_query_expression_clauses = true
+csharp_int_align_fields = true
+csharp_int_align_properties = true
+csharp_int_align_variables = true
+csharp_int_align_assignments = true
+csharp_int_align_comments = true
+csharp_int_align_switch_sections = true
+csharp_wrap_object_and_collection_initializer_style = chop_always
+csharp_wrap_array_initializer_style = chop_always
+csharp_keep_existing_attribute_arrangement = true
