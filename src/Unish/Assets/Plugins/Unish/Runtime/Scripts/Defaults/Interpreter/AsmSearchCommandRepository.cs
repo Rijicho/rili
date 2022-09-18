@@ -5,16 +5,6 @@ using System.Reflection;
 
 namespace Rili.Debug.Shell
 {
-    public sealed class AllAsmSearchCommandRepository : AsmSearchCommandRepository
-    {
-        private AllAsmSearchCommandRepository()
-        {
-        }
-
-        private static AllAsmSearchCommandRepository mInstance;
-        public static  AllAsmSearchCommandRepository Instance => mInstance ??= new AllAsmSearchCommandRepository();
-    }
-
     public class AsmSearchCommandRepository : ADefaultCommandRepository
     {
         private HashSet<Assembly> mAsmCache;
@@ -25,9 +15,9 @@ namespace Rili.Debug.Shell
             Cache(AppDomain.CurrentDomain.GetAssemblies());
         }
 
-        public AsmSearchCommandRepository(params Assembly[] asms)
+        public AsmSearchCommandRepository(params Assembly[] userAssemblies)
         {
-            Cache(asms);
+            Cache(userAssemblies.Append(typeof(UnishCommandBase).Assembly).Distinct());
         }
 
         private void Cache(IEnumerable<Assembly> asms)

@@ -2,18 +2,19 @@
 A shell-like debug console on Unity runtime (for my very personal use) (WIP)
 
 ## Dependencies
-- UniTask v2
-- InputSystem
+- UniTask v2 (required)
+- InputSystem (recommended)
 
 ## Unity version
 2021.3.3f1 or newer
 
 ## Quick Start
 1. Install [UniTask](https://github.com/Cysharp/UniTask)
-2. Install Unish via upm
+2. Install InputSystem via upm
+3. Install Unish via upm
   - Use `Add package from git URL`
   - The URL is: https://github.com/Rijicho/rili.git?path=src/Unish/Assets/Plugins/Unish
-3. Write a script below, attach it to any GameObject and play the scene
+4. Write a script below, attach it to any GameObject and play the scene
 ```C#
 using Rili.Debug.Shell;
 using UnityEngine;

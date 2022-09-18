@@ -1,21 +1,14 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace Rili.Debug.Shell.Example
 {
-    public class ExampleCustomized : MonoBehaviour
+    public class UnishExampleCustomized : MonoBehaviour
     {
-        private Unish mShell;
-
         private void Start()
         {
-            mShell = new Unish(
+            new Unish(
                 // Terminal is the set of presenter/views and initial input handlers.
                 terminal: new DefaultTerminal(
                     font: Resources.Load<Font>("Unish/Fonts/FiraCode/FiraCode-Regular"),
@@ -23,37 +16,43 @@ namespace Rili.Debug.Shell.Example
                     timeProvider: DefaultTimeProvider.Instance,
                     colorParser: DefaultColorParser.Instance
                 ),
-                // Env is the set of initial builtin/environment/shell valiables.
+                // Env is the set of initial builtin/exported/shell valiables.
                 env: new UnishEnvSet(
+                    // Builtin variables can be referenced in all processes.
+                    // Changes in child processes are applied to parents.
                     builtIn: new BuiltinEnv(
                         new("YOUR_BUILTIN_INT_VAR", 1),
                         new("YOUR_BUILTIN_STRING_VAR", "foo"),
                         new("YOUR_BUILTIN_FLOAT_VAR", 0.1f),
                         new("YOUR_BUILTIN_BOOL_VAR", true)
                     ),
+                    // Exported variables can be referenced in all child processes.
+                    // Changes in child processes are NOT applied to parents.
                     export: new ExportEnv(
                         new("YOUR_EXPORTED_VECTOR2_VAR", Vector2.one),
                         new("YOUR_EXPORTED_VECTOR3_VAR", Vector3.one),
                         new("YOUR_EXPORTED_COLOR_VAR", Color.red)
                     )
                 ),
-                // Interpreter parses inputs and run commands.
-                // You can configure the command list here.
+                // Interpreter parses inputs and run commands. You can configure the command list here.
+                // Note that the default command repository searches commands from all assemblies in app and this configuration is not required.
+                // However it is recommended to explicitly set commands or assemblies here for better initialization performance.
                 interpreter: new DefaultInterpreter(
-                    cmdRepo: new AsmSearchCommandRepository(
-                        typeof(UnishCommandBase).Assembly, // Assembly for the builtin commands
-                        typeof(ExtraCommand).Assembly      // for extra commands
+                    // You can set commands explicitly
+                    cmdRepo: new ExplicitCommandRepository(
+                        // Set user-defined commands. (Builtin commands will be added automatically)
+                        typeof(ExtraCommand)
                     )
+                    // Or auto-search commands in specified assemblies
+                    /*
+                    cmdRepo: new AsmSearchCommandRepository(
+                        // Set assemblies in whitch the repository searches for user-defined commands
+                        // (Builtin commands' assembly will be added automatically)
+                        typeof(ExtraCommand).Assembly      
+                    )
+                    */
                 )
-            );
-        }
-
-        private void Update()
-        {
-            if (Keyboard.current.spaceKey.wasPressedThisFrame && !mShell.IsRunning)
-            {
-                mShell.Run();
-            }
+            ).Run();
         }
     }
 
