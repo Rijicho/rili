@@ -14,7 +14,7 @@ public class TestUnishCommandUtils
     [SetUp]
     public void SetUp()
     {
-        env = new UnishEnvSet(new BuiltinEnv(), new GlobalEnv(), new ShellEnv());
+        env = new UnishEnvSet(new BuiltinEnv(), new ExportEnv(), new ShellEnv());
         env.Shell.Set("string", "hogefuga");
         env.Shell.Set("int", 10);
         env.Shell.Set("float", 3.14f);

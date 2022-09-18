@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using UnityEngine;
 
 namespace Rili.Debug.Shell
@@ -7,7 +9,7 @@ namespace Rili.Debug.Shell
     /// </summary>
     public class BuiltinEnv : EnvBase
     {
-        protected override UnishVariable[] Initials { get; } =
+        private readonly UnishVariable[] mRequiredBySystem =
         {
             new(UnishBuiltInEnvKeys.ProfilePath, "~/.uprofile"),
             new(UnishBuiltInEnvKeys.RcPath, "~/.unishrc"),
@@ -17,6 +19,23 @@ namespace Rili.Debug.Shell
             new(UnishBuiltInEnvKeys.BgColor, new Color(0, 0, 0, (float)0xcc / 0xff)),
             new(UnishBuiltInEnvKeys.Quit, false),
         };
+
+        private readonly   UnishVariable[] mExtra;
+        protected override UnishVariable[] Initials => mRequiredBySystem.Concat(mExtra).ToArray();
+
+        public BuiltinEnv()
+        {
+            mExtra = Array.Empty<UnishVariable>();
+        }
+
+        public BuiltinEnv(params UnishVariable[] variables)
+        {
+            mExtra = new UnishVariable[variables.Length];
+            for (var i = 0; i < variables.Length; i++)
+            {
+                mExtra[i] = variables[i];
+            }
+        }
 
         public override IUnishEnv Fork()
         {

@@ -15,85 +15,45 @@ namespace Rili.Debug.Shell.Example
 
         private void Start()
         {
-            mShell = new CustomizedUnish();
+            mShell = new Unish(
+                // Terminal is the set of presenter/views and initial input handlers.
+                terminal: new DefaultTerminal(
+                    font: Resources.Load<Font>("Unish/Fonts/FiraCode/FiraCode-Regular"),
+                    inputHandler: new DefaultInputHandler(DefaultTimeProvider.Instance),
+                    timeProvider: DefaultTimeProvider.Instance,
+                    colorParser: DefaultColorParser.Instance
+                ),
+                // Env is the set of initial builtin/environment/shell valiables.
+                env: new UnishEnvSet(
+                    builtIn: new BuiltinEnv(
+                        new("YOUR_BUILTIN_INT_VAR", 1),
+                        new("YOUR_BUILTIN_STRING_VAR", "foo"),
+                        new("YOUR_BUILTIN_FLOAT_VAR", 0.1f),
+                        new("YOUR_BUILTIN_BOOL_VAR", true)
+                    ),
+                    export: new ExportEnv(
+                        new("YOUR_EXPORTED_VECTOR2_VAR", Vector2.one),
+                        new("YOUR_EXPORTED_VECTOR3_VAR", Vector3.one),
+                        new("YOUR_EXPORTED_COLOR_VAR", Color.red)
+                    )
+                ),
+                // Interpreter parses inputs and run commands.
+                // You can configure the command list here.
+                interpreter: new DefaultInterpreter(
+                    cmdRepo: new AsmSearchCommandRepository(
+                        typeof(UnishCommandBase).Assembly, // Assembly for the builtin commands
+                        typeof(ExtraCommand).Assembly      // for extra commands
+                    )
+                )
+            );
         }
 
         private void Update()
         {
             if (Keyboard.current.spaceKey.wasPressedThisFrame && !mShell.IsRunning)
             {
-                mShell.Reset();
                 mShell.Run();
             }
-        }
-    }
-
-    public sealed class CustomizedUnish : Unish
-    {
-        public CustomizedUnish() : base(
-            // terminal is the set of presenter/views and initial controllers
-            terminal: new CustomizedTerminal(),
-            // env is the set of initial builtin/environment/shell valiables
-            env: new UnishEnvSet(builtIn: new CustomizedBuiltinEnv()),
-            // interpreter parses inputs and run commands 
-            interpreter: new CustomizedInterpreter()
-        )
-        {
-        }
-    }
-
-    public sealed class CustomizedBuiltinEnv : BuiltinEnv
-    {
-        // You can set extra builtin environment variables
-        protected override UnishVariable[] Initials => base.Initials.Concat(new UnishVariable[]
-        {
-            new("YOUR_BUILTIN_INT_VAR", 1),
-            new("YOUR_BUILTIN_STRING_VAR", "foo"),
-            new("YOUR_BUILTIN_FLOAT_VAR", 0.1f),
-            new("YOUR_BUILTIN_BOOL_VAR", true),
-            new("YOUR_BUILTIN_VECTOR2_VAR", Vector2.one),
-            new("YOUR_BUILTIN_VECTOR3_VAR", Vector3.one),
-            new("YOUR_BUILTIN_COLOR_VAR", Color.red),
-        }).ToArray();
-    }
-
-
-    public sealed class CustomizedTerminal : DefaultTerminal
-    {
-        public CustomizedTerminal() : base(
-            font: Resources.Load<Font>("Unish/Fonts/FiraCode/FiraCode-Regular"),
-            inputHandler: new DefaultInputHandler(DefaultTimeProvider.Instance),
-            timeProvider: DefaultTimeProvider.Instance,
-            colorParser: DefaultColorParser.Instance
-        )
-        {
-        }
-    }
-
-    public sealed class CustomizedInterpreter : DefaultInterpreter
-    {
-        public CustomizedInterpreter() : base(CustomizedCmdRepo.Instance)
-        {
-        }
-    }
-
-    public sealed class CustomizedCmdRepo : DefaultCommandRepository
-    {
-        private CustomizedCmdRepo()
-        {
-        }
-
-        private static    CustomizedCmdRepo mInstance;
-        public new static CustomizedCmdRepo Instance => mInstance ??= new CustomizedCmdRepo();
-
-        protected override IEnumerable<Assembly> GetDomainAssemblies()
-        {
-            // Provide all assembries that include commands.
-            // NOTE:
-            //   The default command repository returns AppDomain.CurrentDomain.GetAssemblies().
-            //   Therefore this override is not required for extra commands, but recommended for performance tuning.
-            yield return typeof(UnishCommandBase).Assembly; // Assembly for the builtin commands
-            yield return typeof(ExtraCommand).Assembly;     // for extra commands
         }
     }
 

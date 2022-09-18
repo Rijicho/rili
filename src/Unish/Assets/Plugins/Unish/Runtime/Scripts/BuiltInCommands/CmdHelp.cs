@@ -25,6 +25,7 @@ namespace Rili.Debug.Shell
             await IO.WriteLineAsync("==========================================", "orange");
             await IO.WriteLineAsync("[Help]", "orange");
             await IO.WriteLineAsync("Input command and press Enter key.", "orange");
+            await IO.WriteLineAsync("Console window can be scrolled by Ctrl(Cmd)+Arrow keys.", "orange");
             await IO.WriteLineAsync("");
             await IO.WriteLineAsync("Important commands:", "orange");
             await IO.WriteLineAsync("----------------", "yellow");
@@ -34,8 +35,6 @@ namespace Rili.Debug.Shell
             await IO.WriteLineAsync("----------------", "yellow");
             await Interpreter.Commands["q"].WriteUsage(IO, false, false);
             await IO.WriteLineAsync("----------------", "yellow");
-            await IO.WriteLineAsync("");
-            await IO.WriteLineAsync("This view can be scrolled by Ctrl(Cmd)+Arrow keys.", "orange");
             await IO.WriteLineAsync("==========================================", "orange");
         }
 

@@ -38,9 +38,9 @@ namespace Rili.Debug.Shell
         public UniTask InitializeAsync()
         {
             mDictionary.Clear();
-            foreach (var arg in Initials)
+            foreach (var v in Initials)
             {
-                mDictionary.Add(arg.Name, arg);
+                mDictionary.Add(v.Name, v);
             }
 
             return default;

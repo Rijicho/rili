@@ -8,9 +8,14 @@ namespace Rili.Debug.Shell
     {
         public static string RemoveQuotesIfExist(string token)
         {
-            if ((token[0] == '"' && token[token.Length - 1] == '"')
-                || (token[0] == '\'' && token[token.Length - 1] == '\''))
+            if (token.Length < 2)
+            {
+                return token;
+            }
+            if ((token[0] == '"' && token[token.Length - 1] == '"') || (token[0] == '\'' && token[token.Length - 1] == '\''))
+            {
                 return token.Substring(1, token.Length - 2);
+            }
 
             return token;
         }
@@ -105,7 +110,7 @@ namespace Rili.Debug.Shell
 
                     var varname = input.Substring(beginIdx, endIdx - beginIdx);
                     if (env.BuiltIn.TryGetValue(varname, out var value)
-                        || env.Environment.TryGetValue(varname, out value)
+                        || env.Exported.TryGetValue(varname, out value)
                         || env.Shell.TryGetValue(varname, out value))
                         sb.Append(value.S);
 
@@ -128,7 +133,7 @@ namespace Rili.Debug.Shell
                         : input.Substring(beginIdx, i - beginIdx);
 
                     if (env.BuiltIn.TryGetValue(varname, out var value)
-                        || env.Environment.TryGetValue(varname, out value)
+                        || env.Exported.TryGetValue(varname, out value)
                         || env.Shell.TryGetValue(varname, out value))
                         sb.Append(value.S);
 
@@ -370,6 +375,13 @@ namespace Rili.Debug.Shell
 
             varname = value = null;
             return false;
+        }
+
+        private static readonly System.Type tCommandBase = typeof(UnishCommandBase);
+
+        public static bool IsValidCommandType(System.Type t)
+        {
+            return t.IsSubclassOf(tCommandBase) && !t.IsAbstract;
         }
     }
 }

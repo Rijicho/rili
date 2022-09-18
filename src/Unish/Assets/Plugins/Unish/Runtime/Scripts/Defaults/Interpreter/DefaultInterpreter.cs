@@ -18,7 +18,7 @@ namespace Rili.Debug.Shell
         // ----------------------------------
         public DefaultInterpreter(IUnishCommandRepository cmdRepo = default)
         {
-            mRepository = cmdRepo ?? DefaultCommandRepository.Instance;
+            mRepository = cmdRepo ?? AllAsmSearchCommandRepository.Instance;
         }
 
         public async UniTask InitializeAsync()
@@ -31,7 +31,6 @@ namespace Rili.Debug.Shell
         {
             await mRepository.FinalizeAsync();
             Aliases     = null;
-            mRepository = null;
         }
 
         public async UniTask RunCommandAsync(IUnishProcess shell, string cmd)

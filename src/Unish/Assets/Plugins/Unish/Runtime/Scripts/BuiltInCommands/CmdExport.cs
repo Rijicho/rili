@@ -38,7 +38,7 @@ namespace Rili.Debug.Shell
                 }
                 else
                 {
-                    Env.Environment.Set(varname, value);
+                    Env.Exported.Set(varname, value);
                 }
 
                 return default;
@@ -52,7 +52,7 @@ namespace Rili.Debug.Shell
                 }
                 else
                 {
-                    Env.Environment[input] = val;
+                    Env.Exported[input] = val;
                 }
 
                 return default;

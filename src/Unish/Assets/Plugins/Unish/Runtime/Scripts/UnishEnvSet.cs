@@ -5,33 +5,46 @@ namespace Rili.Debug.Shell
 {
     public class UnishEnvSet : IUnishResource
     {
+        /// <summary>
+        /// Builtin variables can be referenced in all processes.
+        /// Changes in child processes are applied to parents.
+        /// </summary>
         public readonly IUnishEnv BuiltIn;
-        public readonly IUnishEnv Environment;
+
+        /// <summary>
+        /// Exported variables can be referenced in all child processes.
+        /// Changes in child processes are NOT applied to parents.
+        /// </summary>
+        public readonly IUnishEnv Exported;
+
+        /// <summary>
+        /// Shell variables cannot be referenced in any other processes.
+        /// </summary>
         public readonly IUnishEnv Shell;
 
-        public UnishEnvSet(IUnishEnv builtIn=default, IUnishEnv global=default, IUnishEnv shell=default)
+        public UnishEnvSet(IUnishEnv builtIn = default, IUnishEnv export = default, IUnishEnv shell = default)
         {
-            BuiltIn     = builtIn ?? new BuiltinEnv();
-            Environment = global ?? new GlobalEnv();
-            Shell       = shell ?? new ShellEnv();
+            BuiltIn  = builtIn ?? new BuiltinEnv();
+            Exported = export ?? new ExportEnv();
+            Shell    = shell ?? new ShellEnv();
         }
 
         public UnishEnvSet Fork()
         {
-            return new UnishEnvSet(BuiltIn.Fork(), Environment.Fork(), Shell.Fork());
+            return new UnishEnvSet(BuiltIn.Fork(), Exported.Fork(), Shell.Fork());
         }
 
         public async UniTask InitializeAsync()
         {
             await BuiltIn.InitializeAsync();
-            await Environment.InitializeAsync();
+            await Exported.InitializeAsync();
             await Shell.InitializeAsync();
         }
 
         public async UniTask FinalizeAsync()
         {
             await Shell.FinalizeAsync();
-            await Environment.FinalizeAsync();
+            await Exported.FinalizeAsync();
             await BuiltIn.FinalizeAsync();
         }
 
@@ -41,10 +54,12 @@ namespace Rili.Debug.Shell
             {
                 yield return e;
             }
-            foreach (var e in Environment)
+
+            foreach (var e in Exported)
             {
                 yield return e;
             }
+
             foreach (var e in Shell)
             {
                 yield return e;
@@ -53,9 +68,9 @@ namespace Rili.Debug.Shell
 
         public bool ContainsKey(string key)
         {
-            return BuiltIn.ContainsKey(key) || Environment.ContainsKey(key) || Shell.ContainsKey(key);
+            return BuiltIn.ContainsKey(key) || Exported.ContainsKey(key) || Shell.ContainsKey(key);
         }
-        
+
         public bool TryGetValue(string key, out UnishVariable result)
         {
             if (BuiltIn.TryGetValue(key, out result))
@@ -63,7 +78,7 @@ namespace Rili.Debug.Shell
                 return true;
             }
 
-            if (Environment.TryGetValue(key, out result))
+            if (Exported.TryGetValue(key, out result))
             {
                 return true;
             }
@@ -85,9 +100,9 @@ namespace Rili.Debug.Shell
                 return true;
             }
 
-            if (Environment.ContainsKey(key))
+            if (Exported.ContainsKey(key))
             {
-                Environment.Remove(key);
+                Exported.Remove(key);
                 return true;
             }
 
@@ -101,4 +116,3 @@ namespace Rili.Debug.Shell
         }
     }
 }
-

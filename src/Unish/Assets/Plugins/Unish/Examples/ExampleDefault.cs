@@ -16,7 +16,6 @@ namespace Rili.Debug.Shell.Example
         {
             if (Keyboard.current.spaceKey.wasPressedThisFrame && !mShell.IsRunning)
             {
-                mShell.Reset();
                 mShell.Run();
             }
         }

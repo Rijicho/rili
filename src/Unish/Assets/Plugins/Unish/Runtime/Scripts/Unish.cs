@@ -30,7 +30,6 @@ namespace Rili.Debug.Shell
         private Dictionary<string, UnishVariable> mUProfileGlobalEnv;
 
         public bool IsRunning { get; private set; }
-        public bool IsTerminated { get; private set; }
         
         // ----------------------------------
         // public methods
@@ -42,23 +41,9 @@ namespace Rili.Debug.Shell
             IUnishInterpreter interpreter = default,
             IUnishFileSystemRoot fileSystem = default)
         {
-            Reset(env, terminal, interpreter, fileSystem);
-        }
-
-        public void Reset(
-            UnishEnvSet env = default,
-            IUnishTerminal terminal = default,
-            IUnishInterpreter interpreter = default,
-            IUnishFileSystemRoot fileSystem = default)
-        {
-            if (IsRunning)
-            {
-                throw new InvalidOperationException("Running shell cannot be reset. Please quit it first.");
-            }
-            
-            mEnv         = env ?? new UnishEnvSet(new BuiltinEnv(), new GlobalEnv(), new ShellEnv());
+            mEnv         = env ?? new UnishEnvSet(new BuiltinEnv(), new ExportEnv(), new ShellEnv());
             mTerminal    = terminal ?? new DefaultTerminal();
-            mInterpreter = interpreter ?? new DefaultInterpreter(DefaultCommandRepository.Instance);
+            mInterpreter = interpreter ?? new DefaultInterpreter(AllAsmSearchCommandRepository.Instance);
             mFileSystem  = fileSystem ?? new UnishFileSystemRoot();
             var fds = new UnishIOs(mTerminal.ReadLinesAsync, mTerminal.WriteAsync, mTerminal.WriteErrorAsync, mEnv.BuiltIn);
             mTerminalShell = new T
@@ -69,24 +54,9 @@ namespace Rili.Debug.Shell
                 Interpreter = mInterpreter,
                 Directory   = mFileSystem,
             };
-            IsTerminated = false;
         }
 
-        public static void CreateOrReset(ref Unish<T> instance,
-            UnishEnvSet env = default,
-            IUnishTerminal terminal = default,
-            IUnishInterpreter interpreter = default,
-            IUnishFileSystemRoot fileSystem = default)
-        {
-            if (instance == null)
-            {
-                instance = new Unish<T>();
-            }
-            else
-            {
-                instance.Reset();
-            }
-        }
+
         
         public void Run()
         {
@@ -95,10 +65,12 @@ namespace Rili.Debug.Shell
 
         public async UniTask RunAsync()
         {
-            if (IsTerminated)
+            if (IsRunning)
             {
-                throw new InvalidOperationException("This Unish instance was terminated. Please recreate or reset the instance.");
+                UnityEngine.Debug.LogWarning("This Unish instance is already running.");
+                return;
             }
+            
             IsRunning = true;
             try
             {
@@ -109,7 +81,6 @@ namespace Rili.Debug.Shell
             finally
             {
                 IsRunning = false;
-                IsTerminated = true;
             }
         }
 
@@ -162,7 +133,7 @@ namespace Rili.Debug.Shell
                 if (mFileSystem.TryFindEntry(profile, out _))
                 {
                     var defaultBuiltinEnv = mEnv.BuiltIn.ToDictionary(x => x.Key, x => x.Value);
-                    var defaultGlobalEnv  = mEnv.Environment.ToDictionary(x => x.Key, x => x.Value);
+                    var defaultGlobalEnv  = mEnv.Exported.ToDictionary(x => x.Key, x => x.Value);
                     await foreach (var c in mFileSystem.ReadLines(profile))
                     {
                         var cmd = c.Trim();
@@ -177,7 +148,7 @@ namespace Rili.Debug.Shell
                     
                     // uprofile適用後の環境からデフォルト環境を引いて差分を保存しておく
                     mUProfileBuiltinEnv = mEnv.BuiltIn.ToDictionary(x => x.Key, x => x.Value);
-                    mUProfileGlobalEnv  = mEnv.Environment.ToDictionary(x => x.Key, x => x.Value);
+                    mUProfileGlobalEnv  = mEnv.Exported.ToDictionary(x => x.Key, x => x.Value);
                     
                     var toRemove = ListPool<string>.Get();
                     foreach (var e in defaultBuiltinEnv)
@@ -219,7 +190,7 @@ namespace Rili.Debug.Shell
                 }
                 foreach (var e in mUProfileGlobalEnv)
                 {
-                    mEnv.Environment[e.Key] = e.Value;
+                    mEnv.Exported[e.Key] = e.Value;
                 }
             }
 
@@ -262,11 +233,6 @@ namespace Rili.Debug.Shell
             await mFileSystem.FinalizeAsync();
             await mTerminal.FinalizeAsync();
             await mEnv.FinalizeAsync();
-            mEnv           = null;
-            mFileSystem    = null;
-            mTerminal      = null;
-            mInterpreter   = null;
-            mTerminalShell = null;
             await OnPostQuitAsync();
         }
     }

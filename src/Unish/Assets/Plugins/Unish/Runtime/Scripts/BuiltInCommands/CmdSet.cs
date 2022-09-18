@@ -25,7 +25,7 @@ namespace Rili.Debug.Shell
 
             await IO.WriteLineAsync();
             await IO.WriteLineAsync("Environment variables:");
-            foreach (var arg in Env.Environment.OrderBy(v => v.Key))
+            foreach (var arg in Env.Exported.OrderBy(v => v.Key))
             {
                 await IO.WriteLineAsync($"  ${arg.Key} = {arg.Value.S}");
             }

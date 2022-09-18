@@ -40,20 +40,18 @@ namespace Rili.Debug.Shell
                 return default;
             }
 
-            return default;
+            return IO.Err(new ArgumentException("Target not found: " + path));
         }
 
         public override string Usage(string op)
         {
-            return "指定したURLまたはファイルを開きます。";
+            return "'open' opens specified URL or file by your default application.";
         }
 
 
         private static bool IsValidUrlPath(string path)
         {
-            return Uri.TryCreate(path, UriKind.Absolute, out var result)
-                   && (result.Scheme == Uri.UriSchemeHttps || result.Scheme == Uri.UriSchemeHttp);
+            return Uri.TryCreate(path, UriKind.Absolute, out var result) && (result.Scheme == Uri.UriSchemeHttps || result.Scheme == Uri.UriSchemeHttp);
         }
     }
 }
-
