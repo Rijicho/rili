@@ -1,13 +1,21 @@
 # Unish
 A shell-like debug console on Unity runtime (for my very personal use) (WIP)
 
+## Dependencies
+- UniTask v2
+- InputSystem
+
+## Unity version
+2021.3.3f1 or newer
+
 ## Quick Start
-1. Import [UniTask](https://github.com/Cysharp/UniTask)
-2. It is recommended to import [InputSystem](https://docs.unity3d.com/ja/2019.4/Manual/com.unity.inputsystem.html) but can deal with old InputManager.
-3. `git submodule add https://github.com/Rijicho/Unish.git Assets/Unish`
-4. Write a script below, attach it to any GameObject and play the scene
+1. Install [UniTask](https://github.com/Cysharp/UniTask)
+2. Install Unish via upm
+  - Use `Add package from git URL`
+  - The URL is: https://github.com/Rijicho/rili.git?path=src/Unish/Assets/Plugins/Unish
+3. Write a script below, attach it to any GameObject and play the scene
 ```C#
-using RUtil.Debug.Shell;
+using Rili.Debug.Shell;
 using UnityEngine;
 
 public class Test : MonoBehaviour
@@ -19,22 +27,13 @@ public class Test : MonoBehaviour
 }
 ```
 
-## Change Font
-It's highly recommended to replace the terrible default font with your beautiful font:
-```C#
-using RUtil.Debug.Shell;
-using UnityEngine;
+## Add commands
+You can define your command classes deriving from `UnishCommandBase`, and that's the only thing you must to do.
 
-public class Test : MonoBehaviour
-{
-    [SerializeField] private Font font;
+For better initializing performance, it is recommended to define your command repository class.
+It can be easily done by deriving from `DefaultCommandRepository` and override its method `GetDomainAssemblies` to make it load required assemblies only.
 
-    private void Start()
-    {
-        new Unish(terminal: new DefaultTerminal(font)).Run();
-    }
-}
-```
+Please see `Examples/ExampleCustomized.cs` for customization examples.
 
 ## Usage
 - `h` shows the brief help.
